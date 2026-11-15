@@ -231,17 +231,17 @@ Expected evidence slots:
 ```text
 Task-5/screenshots/
 ├── 01-vpc-resource-map.png
-├── 02-ec2-health-database-connected.png
+├── 02-ec2-healthcheck.png
 ├── 03-ami-available.png
-├── 04-ec2-targets-healthy.png
+├── 04-target-group-healthy-ec2.png
 ├── 05-rds-configuration.png
-├── 06-rds-connectivity-and-query.png
+├── 06-rds-connectivity-test.png
 ├── 07-ecr-image.png
-├── 08-ecs-service-2-of-2-running.png
-├── 09-ecs-targets-healthy.png
-├── 10-ecs-autoscaling-policy.png
-├── 11-alb-health-database-connected.png
-└── 12-submission-details.png
+├── 08-ecs-cluster.png
+├── 09-ecs-service-2-running.png
+├── 10-target-group-healthy-ecs.png
+├── 11-autoscaling-policy.png
+└── 12-alb-healthcheck-final.png
 ```
 
 ## Learning Outcomes

@@ -1,4 +1,4 @@
-# Task 4 — Production E-Commerce Environment with ECS, RDS, and S3 Replication
+# Building the Production E-Commerce Environment
 
 [![AWS](https://img.shields.io/badge/AWS-Production%20Environment-orange?logo=amazon-aws)](https://aws.amazon.com/)
 [![Amazon ECS](https://img.shields.io/badge/Amazon%20ECS-2%2F2%20Running-FF9900?logo=amazon-aws)](https://aws.amazon.com/ecs/)

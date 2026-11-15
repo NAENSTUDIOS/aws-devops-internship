@@ -17,13 +17,13 @@ The security objective is consistent throughout the work: understand where traff
 
 | Task | Subject | Status |
 |---|---|---|
-| [Task-1](Task-1/) | AWS fundamentals and Linux administration | Documented |
-| [Task-2](Task-2/) | VPC, subnets, routing, IAM, security groups, and EC2 | Documented |
-| [Task-3](Task-3/) | Containerized e-commerce deployment with ECR and ECS | Documented |
-| [Task-4](Task-4/) | Production ECS service, Multi-AZ RDS, ALB, and S3 replication | Documented |
-| [Task-5](Task-5/) | Production VPC, EC2/AMI, ALB, RDS, ECR, ECS, and auto scaling | Documented |
-| Task-6 | Reserved for the next mentorship stage | Planned |
-| Task-7 | Reserved for the next mentorship stage | Planned |
+| [Building the AWS and Linux foundation](Task-1/) | AWS fundamentals, Linux administration, and network diagnostics | Documented |
+| [Designing the AWS infrastructure foundation](Task-2/) | VPC, subnets, routing, IAM, security groups, EC2, and ALB validation | Documented |
+| [Deploying the containerized e-commerce application](Task-3/) | Docker, private ECR, ECS, RDS PostgreSQL, health checks, and auto scaling | Documented |
+| [Building the production application environment](Task-4/) | ECS redundancy, Multi-AZ RDS, ALB validation, and S3 replication | Documented |
+| [Implementing the multi-tier production deployment](Task-5/) | VPC segmentation, EC2/AMI, ALB, private RDS, ECR, ECS, and auto scaling | Documented |
+| Task-6 | Reserved for the next project stage | Planned |
+| Task-7 | Reserved for the next project stage | Planned |
 
 ## Repository layout
 

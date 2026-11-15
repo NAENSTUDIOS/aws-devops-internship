@@ -1,4 +1,4 @@
-# Task 3 — AWS E-Commerce Application Deployment
+# Deploying the Containerized E-Commerce Application
 
 [![AWS](https://img.shields.io/badge/AWS-Cloud%20Infrastructure-orange?logo=amazon-aws)](https://aws.amazon.com/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)

@@ -1,4 +1,4 @@
-# Task-2 — AWS Infrastructure Foundation
+# Designing the AWS Infrastructure Foundation
 
 ## What I built
 

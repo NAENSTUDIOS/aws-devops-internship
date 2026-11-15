@@ -8,11 +8,11 @@
 
 ## Objective
 
-Build and validate a production-style deployment of the e-commerce application in the Mumbai Region (`ap-south-1`) using private application and database tiers, an internet-facing Application Load Balancer, Amazon RDS PostgreSQL, Amazon ECR, and Amazon ECS on EC2 capacity.
+I built and validated a production-style deployment of the e-commerce application in the Mumbai Region (`ap-south-1`). I used a segmented VPC, private application and database tiers, an internet-facing Application Load Balancer, Amazon RDS PostgreSQL, private ECR, and ECS running on EC2 capacity.
 
-## What Was Implemented
+## What I did
 
-Task 5 progressed the application through two deployment stages:
+I progressed the application through two deployment stages:
 
 1. Prepared and validated the application on EC2.
 2. Created an AMI from the working host.
@@ -48,7 +48,7 @@ Task 5 progressed the application through two deployment stages:
 | ECS tasks | `2 desired`, `2 running`, `0 pending` |
 | Auto scaling | Minimum `2`, maximum `4`, CPU target `50%` |
 
-## Architecture
+## Architecture I built
 
 ```text
 Internet
@@ -78,7 +78,7 @@ EC2 app-server-1        EC2 app-server-2
 
 The target group evidence shows the transition clearly: two EC2 application targets and two ECS container-instance targets were healthy at the time of capture. The final ALB request was served by the ECS-backed application and returned a connected database status.
 
-## VPC and Network Design
+## VPC and network design I implemented
 
 The VPC resource map shows:
 
@@ -92,9 +92,9 @@ The VPC resource map shows:
 
 This layout keeps the database tier away from direct internet exposure while allowing the private application tier to reach required AWS and package endpoints through controlled routing.
 
-## EC2 Preparation and AMI
+## EC2 preparation and AMI
 
-The application was first validated on an EC2 instance named `app-server-1` through Systems Manager Session Manager. The captured health response was:
+I first validated the application on an EC2 instance named `app-server-1` through Systems Manager Session Manager. The captured health response was:
 
 ```json
 {
@@ -103,9 +103,9 @@ The application was first validated on an EC2 instance named `app-server-1` thro
 }
 ```
 
-After the host was working, the instance was converted into the private AMI `app-ami`. The AMI screenshot confirms that it reached the `Available` state and could be used as the basis for repeatable application instances.
+After the host was working, I created the private AMI `app-ami`. The AMI screenshot confirms that it reached the `Available` state and could be used as the basis for repeatable application instances.
 
-## Load Balancer and Target Health
+## Load balancer and target health
 
 The target group `ecom-tg` was configured for the application port and health endpoint. The captured target table shows four healthy targets across both Availability Zones:
 
@@ -152,7 +152,7 @@ The private ECR repository `ecom-app` contains the `latest` image:
 
 The image was available for the ECS task definition used by the final service deployment.
 
-## ECS Deployment
+## ECS deployment I completed
 
 The ECS console confirms:
 
@@ -167,7 +167,7 @@ The ECS console confirms:
 
 The service ran as a replica deployment on EC2 capacity, with the ALB target group forwarding traffic to the container tasks.
 
-## Auto Scaling
+## Auto scaling I configured
 
 The service auto scaling configuration shows:
 
@@ -181,7 +181,7 @@ The service auto scaling configuration shows:
 
 This keeps a baseline of two tasks for availability while allowing the service to add capacity as average CPU utilization increases.
 
-## Final Validation
+## Final validation I performed
 
 The final browser check used the ALB endpoint:
 
@@ -202,7 +202,7 @@ The response confirmed both application and database health:
 
 This is the most important end-to-end result in the task: internet traffic reached the ALB, the ALB reached the ECS-backed application, and the application reached private PostgreSQL successfully.
 
-## Security Decisions
+## Security decisions I made
 
 - Database public access was disabled.
 - RDS was placed in a dedicated database subnet group.
@@ -212,7 +212,7 @@ This is the most important end-to-end result in the task: internet traffic reach
 - The container image was stored in a private ECR repository.
 - Credentials and secrets are excluded from this repository.
 
-## Troubleshooting and Engineering Decisions
+## Troubleshooting and engineering decisions
 
 - Validated the application locally on EC2 before creating the AMI.
 - Used AMI creation to avoid rebuilding the host configuration manually.
@@ -221,18 +221,17 @@ This is the most important end-to-end result in the task: internet traffic reach
 - Confirmed the ECS deployment reached `Success` before relying on the service.
 - Used the ALB health endpoint as the final cross-layer test instead of treating task status alone as proof.
 
-## Learning Outcomes
+## What I learned
 
-- Designed a multi-tier AWS network across two Availability Zones.
-- Used private subnets and security groups to protect the database tier.
-- Administered private EC2 instances with Systems Manager.
-- Created and validated a reusable AMI.
-- Registered and monitored targets through an Application Load Balancer.
-- Configured encrypted, Multi-AZ PostgreSQL on Amazon RDS.
-- Published a container image to private ECR.
-- Deployed ECS on EC2 capacity with two running tasks.
-- Configured CPU-based target tracking from two to four tasks.
-- Verified the complete request path with a real ALB health check.
+- I learned how to design a multi-tier VPC across two Availability Zones instead of placing every resource in one network segment.
+- I learned how private subnets, NAT, security groups, and a private RDS endpoint work together to reduce direct exposure.
+- I learned how Systems Manager can provide administration access without depending on an SSH key-pair workflow.
+- I learned how an AMI turns a validated EC2 host into repeatable application capacity.
+- I learned how to move from EC2 application targets to ECS container targets while continuing to validate target health through the ALB.
+- I learned how to deploy encrypted Multi-AZ PostgreSQL and verify that it is not publicly accessible.
+- I learned how private ECR, ECS task definitions, EC2 capacity, and dynamic container ports connect in an ECS deployment.
+- I learned how CPU target tracking maintains two tasks and can scale the service up to four.
+- I learned to treat the final ALB health response as the proof of the complete application-to-database path.
 
 ## Screenshots
 

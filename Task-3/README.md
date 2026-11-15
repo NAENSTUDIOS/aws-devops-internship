@@ -8,11 +8,11 @@
 
 ## Objective
 
-Deploy the containerized e-commerce application on AWS, connect it to a PostgreSQL database, publish the Docker image to Amazon ECR, run the application through Amazon ECS, and configure service auto scaling for resilient operation.
+I deployed the containerized e-commerce application on AWS, connected it to PostgreSQL, published the image to private Amazon ECR, and ran it as an Amazon ECS service with two tasks and CPU-based service auto scaling.
 
-## Project Overview
+## What I did
 
-Task 3 moved the e-commerce application from local Docker execution to an AWS-managed container deployment. The application health endpoint returned a successful response with `"status":"ok"` and `"database":"connected"`. The production container image was stored in the private `e-com-app` ECR repository and consumed by the ECS service.
+I moved the e-commerce application from a local Docker image into an AWS container deployment. I built the image, pushed it to a private ECR repository, referenced it from an ECS task definition, and deployed the service with two running tasks. I connected the application to the PostgreSQL database and used the health endpoint to verify both the application and database layers.
 
 The captured AWS console evidence shows:
 
@@ -31,7 +31,7 @@ The captured AWS console evidence shows:
 - Service auto scaling range: `2–4` tasks
 - CPU target-tracking policy: `50%`
 
-## Architecture Overview
+## Architecture I implemented
 
 The implementation evidence supplied for this task describes the following request and data flow:
 
@@ -51,7 +51,7 @@ Docker container (application :3000)
 Amazon RDS for PostgreSQL (:5432)
 ```
 
-The screenshots directly verify the container image, ECS service, running tasks, scaling policy, and database health response. The load balancer, networking, and database resources are documented from the implementation evidence supplied with the task.
+The screenshots verify the application health response, ECR image, ECS service, running tasks, and scaling policy. The load-balancer, network, and database configuration formed the supporting path for the deployment.
 
 ## AWS Services Used
 
@@ -80,7 +80,7 @@ The screenshots directly verify the container image, ECS service, running tasks,
 - **Health check path:** `/health`.
 - **Service scaling:** minimum `2`, maximum `4`, target CPU utilization `50%`.
 
-## Implementation Steps
+## Steps I followed
 
 1. Built the e-commerce application image with Docker.
 2. Created the private ECR repository `e-com-app`.
@@ -95,7 +95,7 @@ The screenshots directly verify the container image, ECS service, running tasks,
 11. Added ECS target-tracking auto scaling for 2–4 tasks at 50% average CPU utilization.
 12. Validated application and database health through `/health`.
 
-## Security Configuration
+## Security configuration I applied
 
 The supplied implementation evidence identifies separate traffic controls for the load balancer, application, and database:
 
@@ -107,7 +107,7 @@ The supplied implementation evidence identifies separate traffic controls for th
 
 Secrets shown in deployment configuration are intentionally not reproduced in this repository.
 
-## Application Deployment Process
+## Deployment flow I used
 
 The deployment flow was:
 
@@ -123,7 +123,7 @@ Docker build
 
 The ECR screenshot confirms an active `e-com-app:latest` image with a recorded digest. The ECS screenshot confirms a successful deployment with two running tasks and no pending tasks.
 
-## Database Configuration
+## Database configuration
 
 The application was configured to use Amazon RDS for PostgreSQL with the following application-level settings:
 
@@ -136,7 +136,7 @@ DB_HOST=<RDS endpoint>
 
 Database connectivity was validated through the application health endpoint. The supplied evidence also records SQL verification of the `products` table and a count of `12` product rows.
 
-## Load Balancer Configuration
+## Load-balancer configuration
 
 The supplied implementation evidence records an Application Load Balancer configured with:
 
@@ -147,7 +147,7 @@ The supplied implementation evidence records an Application Load Balancer config
 
 The provided screenshots do not expose the ALB DNS name, so it is intentionally represented as a placeholder in this documentation.
 
-## Validation and Testing
+## How I validated the deployment
 
 The following results were captured or supplied as implementation evidence:
 
@@ -172,7 +172,7 @@ Example health response:
 }
 ```
 
-## Troubleshooting Performed
+## Troubleshooting I performed
 
 The implementation evidence records troubleshooting for:
 
@@ -185,7 +185,7 @@ The implementation evidence records troubleshooting for:
 
 Troubleshooting was completed by checking task status, validating configuration values, confirming network access between application and database tiers, and rechecking the health endpoint after each correction.
 
-## Challenges Faced
+## Challenges I faced
 
 - Coordinating image naming, tagging, and registry authentication between Docker and ECR.
 - Ensuring the ECS task received the correct database endpoint and application configuration.
@@ -193,7 +193,7 @@ Troubleshooting was completed by checking task status, validating configuration 
 - Getting the load balancer health check to reach the application on port `3000`.
 - Maintaining a minimum of two healthy application tasks while enabling controlled scale-out.
 
-## Solutions Applied
+## Solutions I applied
 
 - Standardized the image as `e-com-app:latest` in the private ECR repository.
 - Updated the ECS task configuration with the required application and database variables.
@@ -202,15 +202,14 @@ Troubleshooting was completed by checking task status, validating configuration 
 - Configured ECS target tracking with a 50% CPU target and a 2–4 task range.
 - Revalidated both container health and database connectivity after deployment changes.
 
-## Learning Outcomes
+## What I learned
 
-- Built and published a production-oriented Docker image to Amazon ECR.
-- Deployed a versioned ECS task definition and managed it through an ECS service.
-- Applied container port mapping between an ECS task, target group, and application.
-- Connected a containerized service to PostgreSQL on Amazon RDS.
-- Designed security-group traffic flow between load balancer, application, and database tiers.
-- Used ECS service auto scaling to maintain capacity between two and four tasks.
-- Troubleshot image, configuration, networking, and health-check failures using AWS console evidence.
+- I learned how Docker image naming, tagging, registry authentication, and ECS task definitions fit together.
+- I learned how a container port mapping must line up with the target group and application listener path.
+- I learned how to connect an ECS workload to PostgreSQL without exposing the database directly to the internet.
+- I learned to use a health endpoint as an end-to-end check instead of relying only on an ECS task showing `RUNNING`.
+- I learned how ECS target tracking maintains a baseline of two tasks while allowing scale-out to four.
+- I learned to troubleshoot image, environment-variable, security-group, database, and target-health issues as separate layers.
 
 ## Professional Summary
 

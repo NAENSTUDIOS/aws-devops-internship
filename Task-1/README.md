@@ -1,44 +1,32 @@
 # Task-1 — AWS Fundamentals and Linux Administration
 
-## Objective
+## What I worked on
 
-Build the AWS and Linux foundation required to operate cloud infrastructure safely from the command line.
+I used this task to build the operational foundation for the rest of the mentorship. I learned how AWS Regions and Availability Zones are organised, how the shared responsibility model applies to cloud infrastructure, and how to navigate the AWS Console without treating the console as a substitute for understanding the underlying resources.
 
-## Scope
+I also practised administering Linux systems from the command line. This included moving around the filesystem, creating and inspecting files, managing permissions and users, installing packages, controlling services, and checking logs and network connections.
 
-### AWS fundamentals
+## What I used
 
-- Cloud computing concepts
-- AWS global infrastructure
-- Regions and Availability Zones
-- The AWS shared responsibility model
-- AWS Management Console navigation
+- AWS Management Console
+- AWS Regions and Availability Zones
+- Linux shell
+- `sudo` and user administration
+- `systemctl` for service management
+- `ping` and `curl` for reachability and HTTP checks
+- `netstat` and `ss` for socket and connection inspection
+- Basic file commands such as `pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `rm`, `cat`, and `nano`
 
-### Linux administration
-
-- File and directory management
-- Users and permissions
-- Package installation
-- Service management with `systemctl`
-- Log inspection
-- Command-line operations
-
-### Networking fundamentals
-
-- Basic reachability checks with `ping`
-- HTTP testing with `curl`
-- Socket and connection inspection with `netstat` and `ss`
-
-## Commands Practised
+## Commands I practised
 
 ```bash
 pwd
 ls -la
 cd
 mkdir
-rm
 cp
 mv
+rm
 cat
 nano
 sudo su -
@@ -46,48 +34,31 @@ systemctl status
 systemctl start
 systemctl stop
 systemctl restart
-ping
-curl
+ping <host>
+curl http://<host>
 netstat
 ss
 ```
 
-## Security Relevance
+## What I learned
 
-This task established the operational habits used later in the repository: work from the command line, verify service state instead of assuming it, inspect network behaviour, and understand the boundary between AWS-managed controls and customer-managed configuration.
+- I learned to verify the state of a service instead of assuming that it is running.
+- I learned how basic Linux file, user, permission, and process operations support cloud administration.
+- I learned to separate an application problem from a network reachability problem using simple command-line checks.
+- I learned why Regions and Availability Zones matter when planning availability and disaster recovery.
+- I built the command-line habits that I later used for EC2, ECS, RDS, and load-balancer troubleshooting.
 
-## Learning Outcomes
+## Security and operations lessons
 
-- Navigated AWS Regions and Availability Zones with an infrastructure mindset.
-- Used Linux commands to inspect and modify a server environment.
-- Managed services and checked their state with `systemctl`.
-- Applied basic network diagnostics before escalating a connectivity problem.
-- Built the baseline needed for IAM, VPC, EC2, and container operations.
+This task showed me that cloud security starts with small operational decisions. I need to know which user is executing a command, which service is listening, which network path is reachable, and which responsibility belongs to AWS versus me. These checks became the basis for the IAM, VPC, security-group, and container work in later tasks.
 
-## Uploaded Evidence
+## Evidence included
 
-The Task-1 evidence package includes:
+- [`evidence/ips.txt`](evidence/ips.txt) — recorded staging and production host addresses from the exercise.
+- [`evidence/singapore-dr-estimate.pdf`](evidence/singapore-dr-estimate.pdf) — Singapore disaster-recovery cost estimate.
 
-- `ips.txt` with the recorded staging and production host addresses.
-- `singapore-dr-estimate.pdf`, an AWS Pricing Calculator export for the Singapore disaster-recovery planning work.
+The evidence files are retained for portfolio context. They are not credentials and should not be used as a replacement for DNS, IAM, security-group, or service-health validation.
 
-Recorded addresses:
+## Status
 
-```text
-Staging:    13.201.123.240
-Production: 13.232.86.43
-```
-
-The IP addresses are retained as evidence only; they are not treated as credentials or as a substitute for DNS, security-group, and service-health validation.
-
-## Screenshots
-
-Screenshots will be added to `Task-1/screenshots/` when the Task-1 console and terminal evidence is uploaded.
-
-```text
-Task-1/screenshots/
-├── aws-console.png
-├── linux-terminal.png
-├── file-management.png
-└── system-services.png
-```
+Task 1 is documented from the learning activities and evidence retained in this repository. Console and terminal screenshots can be added later if they become available.

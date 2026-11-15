@@ -1,66 +1,32 @@
 # Task-2 — AWS Infrastructure Foundation
 
-## Objective
+## What I built
 
-Design and validate the network, identity, and compute foundation required for secure application workloads on AWS.
+I created the AWS foundation required to run an application safely. I worked with a VPC, public and private subnets, route tables, an Internet Gateway, IAM access, security groups, and an EC2 instance. I also used the application load-balancer endpoint provided for the environment to validate the public application path.
 
-## Infrastructure Built
+## Infrastructure I configured
 
-### VPC and subnets
-
-- Created a VPC with a defined CIDR range.
-- Configured public and private subnets.
-- Enabled DNS settings required by the workload.
-
-### Internet connectivity and routing
-
-- Attached an Internet Gateway.
-- Configured route tables for public access.
-- Associated the appropriate subnets with their route tables.
-
-### Security groups
-
-Defined access rules for:
-
-- HTTP on port `80`
-- HTTPS on port `443`
-- SSH on port `22`
-- Application traffic where required
-
-The design principle was to allow only the traffic needed by each tier rather than expose every resource broadly.
-
-### IAM
-
-- Created IAM users, roles, and policies.
-- Applied least-privilege access as the operating principle.
-- Separated human access from workload permissions.
-
-### EC2
-
-- Launched an Amazon Linux instance.
-- Associated the instance with a security group.
-- Configured user access.
-- Validated reachability and administration using `ssh`, `ping`, and `curl`.
-
-### Application endpoint
-
-The production Application Load Balancer endpoint supplied for this environment is:
+- A VPC with a defined CIDR range and DNS support.
+- Public and private subnet placement for separating internet-facing and internal resources.
+- Internet Gateway and route-table associations for controlled connectivity.
+- Security-group rules for HTTP `80`, HTTPS `443`, SSH `22`, and application traffic.
+- IAM users, roles, and policies with least-privilege access as the design goal.
+- An Amazon Linux EC2 instance associated with the required security group.
+- An Application Load Balancer endpoint:
 
 ```text
 http://prod-alb-1957656459.ap-south-1.elb.amazonaws.com
 ```
 
-This endpoint is the public HTTP entry point for the application path. It should be tested with `curl` after confirming that the ALB listener, target group, security group, and backend service are ready.
-
-## Architecture
+## Architecture I worked with
 
 ```text
 Internet user
-    |
-    v
+      |
+      v
 Application Load Balancer
-    |
-    v
+      |
+      v
 VPC
   +---+---+
   |       |
@@ -71,17 +37,7 @@ Subnet  Subnet
 EC2 instance
 ```
 
-## Security Focus
-
-Task 2 introduced the controls that later support the ECS and RDS deployment:
-
-- Network segmentation between public and private areas.
-- Explicit ingress rules through security groups.
-- IAM roles and policies instead of embedding access keys in workloads.
-- SSH used for administration and restricted through security-group rules.
-- Connectivity tested from the actual instance environment.
-
-## Validation
+## Validation I performed
 
 ```bash
 ping <host>
@@ -89,25 +45,20 @@ curl http://prod-alb-1957656459.ap-south-1.elb.amazonaws.com
 ssh <user>@<host>
 ```
 
-## Learning Outcomes
+I used these checks to confirm that the host was reachable, that the public HTTP path responded, and that I could administer the EC2 instance through the intended access method.
 
-- Designed a basic AWS network boundary.
-- Distinguished public and private subnet use cases.
-- Connected routing decisions to security outcomes.
-- Configured IAM access with least privilege in mind.
-- Launched and administered an EC2 instance.
-- Built the infrastructure vocabulary needed for production container platforms.
+## What I learned
 
-## Screenshots
+- I learned how subnet placement changes the exposure and routing of an AWS resource.
+- I learned that route tables and security groups solve different problems: routes determine where traffic can go, while security groups control which traffic is allowed.
+- I learned to treat IAM permissions as part of the infrastructure design rather than as an afterthought.
+- I learned how an EC2 instance fits into a larger VPC and load-balancer path.
+- I learned that connectivity should be tested from the actual workload environment, not only from my laptop.
 
-Screenshots will be added to `Task-2/screenshots/` when the Task-2 evidence set is uploaded.
+## Security decisions
 
-```text
-Task-2/screenshots/
-├── vpc-overview.png
-├── subnets.png
-├── route-table.png
-├── security-groups.png
-├── iam-role.png
-└── ec2-instance.png
-```
+I separated public and private network areas, restricted administrative access through security-group rules, and used IAM roles and policies instead of embedding access keys in the application. This task gave me the networking and identity foundation used by the ECS and RDS deployments later in the repository.
+
+## Status
+
+Task 2 is documented from the infrastructure configuration, endpoint, and validation details retained for this environment. Additional console screenshots can be added when available.

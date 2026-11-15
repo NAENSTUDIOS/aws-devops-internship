@@ -21,7 +21,7 @@ The security objective is consistent throughout the work: understand where traff
 | [Task-2](Task-2/) | VPC, subnets, routing, IAM, security groups, and EC2 | Documented |
 | [Task-3](Task-3/) | Containerized e-commerce deployment with ECR and ECS | Documented |
 | [Task-4](Task-4/) | Production ECS service, Multi-AZ RDS, ALB, and S3 replication | Documented |
-| [Task-5](Task-5/) | Production VPC, EC2/AMI, ALB, RDS, ECR, ECS, and auto scaling | In progress |
+| [Task-5](Task-5/) | Production VPC, EC2/AMI, ALB, RDS, ECR, ECS, and auto scaling | Documented |
 | Task-6 | Reserved for the next mentorship stage | Planned |
 | Task-7 | Reserved for the next mentorship stage | Planned |
 

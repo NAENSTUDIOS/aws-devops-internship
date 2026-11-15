@@ -7,11 +7,11 @@
 
 ## Objective
 
-Build a production-oriented environment for the e-commerce application using Amazon ECS, PostgreSQL on Amazon RDS, an Application Load Balancer, and Amazon S3 cross-region replication.
+I extended the e-commerce deployment into a more production-oriented environment using Amazon ECS, Multi-AZ PostgreSQL on Amazon RDS, an Application Load Balancer, and S3 cross-region replication.
 
-## Project Overview
+## What I did
 
-Task 4 extended the container deployment into a production environment in the `ap-south-1` Mumbai Region. The evidence shows an available PostgreSQL database, two running ECS tasks, successful database validation from inside an ECS task, ALB-served application content, a successful S3 upload in Mumbai, and an enabled replication rule to Singapore.
+I ran the application as an ECS service with two active tasks, connected it to an encrypted Multi-AZ RDS PostgreSQL database, and validated the database from inside a running ECS task. I also uploaded an object to an S3 bucket in Mumbai and configured replication to Singapore. Finally, I checked the application through the ALB instead of validating only individual AWS resources.
 
 ## Evidence Summary
 
@@ -104,7 +104,7 @@ The application tier runs two ECS tasks for redundancy. The database tier uses M
 - Replication status: `Enabled`
 - Test object: `test-file.txt`
 
-## Implementation Steps
+## Steps I followed
 
 1. Provisioned the PostgreSQL RDS instance `ecomdb` in Mumbai.
 2. Configured the `shop` database, `appuser`, port `5432`, VPC, subnet group, and RDS security group.
@@ -130,7 +130,7 @@ Endpoint: ecomdb.cxweesk666j4.ap-south-1.rds.amazonaws.com
 
 The endpoint is included because it is visible in the supplied screenshot. Database passwords and other secrets are intentionally excluded.
 
-## Database Validation
+## Database validation I performed
 
 The validation was executed from an ECS task using ECS Exec. The first attempt showed that the `psql` binary was not installed in the container. The database check was then completed with the Node.js PostgreSQL client:
 
@@ -141,7 +141,7 @@ count = 12
 
 This confirms that the running application environment could reach RDS and read the expected product data.
 
-## Load Balancer Validation
+## Load-balancer validation I performed
 
 The ALB hostname was queried with `curl`:
 
@@ -151,7 +151,7 @@ http://ecom-alb-new-56207691.ap-south-1.elb.amazonaws.com
 
 The response returned the Shop application HTML, including the page title `Shop hehe | DevOps Shop` and the application stylesheet reference. This verifies that traffic reached the deployed application through the load balancer.
 
-## S3 Upload and Replication
+## S3 upload and replication I configured
 
 The Mumbai upload screen shows:
 
@@ -162,7 +162,7 @@ The Mumbai upload screen shows:
 
 The Singapore bucket shows the same object name, and the Mumbai bucket’s Management tab shows the enabled `mumbai-to-singapore` replication rule targeting the Singapore bucket in `ap-southeast-1`.
 
-## Security and Availability
+## Security and availability decisions
 
 - RDS storage encryption was enabled.
 - RDS Multi-AZ was enabled across `ap-south-1a` and `ap-south-1b`.
@@ -171,7 +171,7 @@ The Singapore bucket shows the same object name, and the Mumbai bucket’s Manag
 - ECS maintained two running tasks instead of relying on a single application task.
 - S3 replication provided a second regional copy of uploaded objects.
 
-## Troubleshooting Performed
+## Troubleshooting I performed
 
 - When `psql` was unavailable inside the ECS task, used the already-supported Node.js PostgreSQL client to perform the same query.
 - Verified the RDS endpoint, port, database name, and username from the RDS console before querying.
@@ -179,28 +179,28 @@ The Singapore bucket shows the same object name, and the Mumbai bucket’s Manag
 - Confirmed the ALB returned application HTML rather than an unreachable-host or target-health error.
 - Confirmed S3 upload completion showed one success and zero failures.
 
-## Challenges Faced
+## Challenges I faced
 
 - Validating database access from the running container rather than only from a local machine.
 - Working around the absence of the `psql` command-line client in the ECS container.
 - Maintaining two healthy ECS tasks during production-service validation.
 - Verifying that S3 replication was enabled in the correct source Region and pointed to the Singapore destination.
 
-## Solutions Applied
+## Solutions I applied
 
 - Used ECS Exec to run the database check inside the deployed task.
 - Used Node.js and the PostgreSQL client already available to the application runtime.
 - Verified the ECS service overview showed `2 running | 0 pending` and a successful deployment.
 - Validated S3 replication by checking both destination objects and the source-bucket replication rule.
 
-## Learning Outcomes
+## What I learned
 
-- Configured a Multi-AZ PostgreSQL deployment with encrypted RDS storage.
-- Validated application-to-database connectivity from a live ECS task.
-- Used ECS service redundancy with two active application tasks.
-- Tested an ALB-backed application endpoint using `curl`.
-- Implemented S3 cross-region replication from Mumbai to Singapore.
-- Troubleshot production containers using ECS Exec and runtime tooling.
+- I learned how Multi-AZ RDS improves database availability without changing the application connection model.
+- I learned how to validate database access from the running container rather than assuming that a green ECS service means the database is reachable.
+- I learned how ECS desired count and running count provide a simple availability check for the application tier.
+- I learned how to use `curl` against the ALB to verify the complete request path.
+- I learned that S3 cross-region replication requires both a source upload and a correctly enabled replication rule with the destination bucket.
+- I learned to use the tools already available in the runtime when a troubleshooting utility such as `psql` is not installed.
 
 ## Screenshots
 

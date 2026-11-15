@@ -32,32 +32,37 @@ I ran the application as an ECS service with two active tasks, connected it to a
 | Replication rule | `mumbai-to-singapore`, enabled |
 | ALB validation | ALB hostname returned the Shop application HTML |
 
-## Architecture Overview
+## Architecture I implemented
 
 ```text
-Internet user
-      |
-      v
-Application Load Balancer
-      |
-      v
-ECS service: e-com-service
-      |
-  +---+---+
-  |       |
-Task 1  Task 2
-      |
-      v
-Amazon RDS PostgreSQL
+                         Internet user
+                               |
+                               v
+                    Application Load Balancer
+                               |
+                               v
+                    ECS service: e-com-service
+                         +-----+-----+
+                         |           |
+                       Task 1      Task 2
+                         +-----+-----+
+                               |
+                               v
+                    Multi-AZ RDS PostgreSQL
+                    Primary: ap-south-1a
+                  Standby:  ap-south-1b
 
-Amazon S3: Mumbai bucket
-      |
-      | Cross-region replication
-      v
-Amazon S3: Singapore bucket
+Application upload
+       |
+       v
+S3 Mumbai bucket
+       |
+       | enabled cross-region replication
+       v
+S3 Singapore bucket
 ```
 
-The application tier runs two ECS tasks for redundancy. The database tier uses Multi-AZ RDS PostgreSQL, while uploaded objects are replicated from Mumbai to Singapore for regional durability.
+The application tier runs two ECS tasks for redundancy. The database tier uses Multi-AZ RDS PostgreSQL, while uploaded objects are copied from Mumbai to Singapore for regional durability.
 
 ## AWS Services Used
 

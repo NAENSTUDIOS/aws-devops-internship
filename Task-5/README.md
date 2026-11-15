@@ -52,31 +52,34 @@ I progressed the application through two deployment stages:
 
 ```text
 Internet
-    |
-    v
-Application Load Balancer
-    |
-    v
+   |
+   v
+Application Load Balancer :80
+   |
+   v
 Target group: ecom-tg
-    |
-    +-------------------------+
-    |                         |
-EC2 app-server-1        EC2 app-server-2
-    |                         |
-    +-----------+-------------+
-                |
-                v
-        ECS service: ecom-service
-        Cluster: ecom-ec2-cluster
-        2 EC2 container instances
-        2 running tasks
-                |
-                v
-        Private RDS PostgreSQL
-        Database: shopdb
+   |
+   +------------------------ VPC: ecom-vpc-vpc ------------------------+
+   |                                                                    |
+   |  Availability Zone ap-south-1a       Availability Zone ap-south-1b |
+   |  +-------------------------------+    +-----------------------------+ |
+   |  | app-server-1                  |    | app-server-2                | |
+   |  | ECS container instance       |    | ECS container instance     | |
+   |  | ECS task                     |    | ECS task                   | |
+   |  +---------------+---------------+    +---------------+-------------+ |
+   |                  |                                    |               |
+   |                  +----------------+-------------------+               |
+   |                                   v                                   |
+   |                         Private RDS PostgreSQL                        |
+   |                              Database: shopdb                         |
+   |                                                                    |
+   |  Public subnets -> ALB / Internet Gateway                           |
+   |  Private app subnets -> NAT gateway                                 |
+   |  Private DB subnets -> RDS subnet group                             |
+   +--------------------------------------------------------------------+
 ```
 
-The target group evidence shows the transition clearly: two EC2 application targets and two ECS container-instance targets were healthy at the time of capture. The final ALB request was served by the ECS-backed application and returned a connected database status.
+The deployment path was prepared on EC2 first and then served through ECS on EC2 capacity. The target group evidence shows two EC2 application targets and two ECS container-instance targets healthy during the transition. The final ALB request was served by the ECS-backed application and returned a connected database status.
 
 ## VPC and network design I implemented
 

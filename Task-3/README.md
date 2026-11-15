@@ -33,22 +33,43 @@ The captured AWS console evidence shows:
 
 ## Architecture I implemented
 
-The implementation evidence supplied for this task describes the following request and data flow:
+I used two connected flows: one to move the application image into AWS, and one to serve user traffic through the running application.
+
+```text
+Docker build
+    |
+    v
+Private Amazon ECR
+    |
+    v
+ECS task definition
+    |
+    v
+ECS service
+```
 
 ```text
 User
   |
   v
-Application Load Balancer (HTTP :80)
+Application Load Balancer :80
   |
   v
-ECS Service
+ECS service
+  +--> Task 1: Docker container :3000
   |
-  v
-Docker container (application :3000)
-  |
-  v
-Amazon RDS for PostgreSQL (:5432)
+  +--> Task 2: Docker container :3000
+                 |
+                 v
+       Amazon RDS PostgreSQL :5432
+```
+
+```text
+ECS service auto scaling
+        |
+        +--> minimum: 2 tasks
+        +--> CPU target: 50%
+        +--> maximum: 4 tasks
 ```
 
 The screenshots verify the application health response, ECR image, ECS service, running tasks, and scaling policy. The load-balancer, network, and database configuration formed the supporting path for the deployment.

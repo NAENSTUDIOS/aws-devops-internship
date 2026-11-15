@@ -17,6 +17,28 @@ I also practised administering Linux systems from the command line. This include
 - `netstat` and `ss` for socket and connection inspection
 - Basic file commands such as `pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `rm`, `cat`, and `nano`
 
+## Architecture and operating model
+
+```text
+Engineer
+   |
+   +--> AWS Console / CLI
+   |        |
+   |        +--> AWS Region
+   |                 |
+   |                 +--> Availability Zone
+   |                          |
+   |                          v
+   +--------------------> Linux host
+                              |
+                +-------------+-------------+
+                |                           |
+        File and service operations   Network checks
+        pwd, ls, systemctl            ping, curl, ss
+```
+
+This is the operating model I practised rather than a production application architecture. I used AWS to understand the infrastructure location and Linux tools to inspect the host, services, and network behaviour.
+
 ## Commands I practised
 
 ```bash

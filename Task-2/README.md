@@ -18,24 +18,32 @@ I created the AWS foundation required to run an application safely. I worked wit
 http://prod-alb-1957656459.ap-south-1.elb.amazonaws.com
 ```
 
-## Architecture I worked with
+## Architecture I designed
 
 ```text
 Internet user
       |
       v
-Application Load Balancer
+Application Load Balancer :80
+      |
+      v
+Internet Gateway
       |
       v
 VPC
-  +---+---+
-  |       |
-Public  Private
-Subnet  Subnet
-  |
-  v
-EC2 instance
+  +-------------------+-------------------+
+  |                                       |
+Public route table                 Private route table
+  |                                       |
+Public subnet                            |
+  |                                       |
+  +--> EC2 instance <--- security group --+
+             ^
+             |
+       IAM user / role
 ```
+
+The public path handled application traffic through the load balancer and Internet Gateway. The private area represented internal workload placement, while security groups controlled allowed traffic and IAM controlled administrative permissions.
 
 ## Validation I performed
 

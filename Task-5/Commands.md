@@ -1,6 +1,6 @@
 # Task-5 Commands
 
-These commands follow the Task-5 implementation guide. Replace placeholders with values from the AWS account. Do not place credentials, passwords, access keys, or JWT secrets in this file.
+Commands used or directly represented by the Task-5 implementation evidence. Replace placeholders before use and never commit credentials.
 
 ## AWS CLI Setup
 
@@ -9,28 +9,36 @@ export AWS_REGION=ap-south-1
 export AWS_PAGER=""
 ```
 
-Confirm the active identity and region:
-
 ```bash
 aws sts get-caller-identity
 aws configure get region
 ```
 
-## Systems Manager and EC2
+## EC2 and Systems Manager
 
 Start a Session Manager shell:
 
 ```bash
-aws ssm start-session --target <instance-id> --region "$AWS_REGION"
+aws ssm start-session \
+  --target <INSTANCE-ID> \
+  --region "$AWS_REGION"
 ```
 
-Validate the local application from the EC2 instance:
+Validate the application from the EC2 host:
 
 ```bash
 curl http://localhost:3000/health
 ```
 
-Check that the RDS endpoint is reachable on PostgreSQL port `5432`:
+Expected result:
+
+```json
+{"status":"ok","database":"connected"}
+```
+
+## RDS Connectivity
+
+Check that PostgreSQL is reachable from the application tier:
 
 ```bash
 timeout 5 bash -c '</dev/tcp/<RDS-ENDPOINT>/5432' \
@@ -38,38 +46,7 @@ timeout 5 bash -c '</dev/tcp/<RDS-ENDPOINT>/5432' \
   || echo blocked
 ```
 
-## Linux Application Preparation
-
-```bash
-sudo dnf update -y
-sudo dnf install -y git docker postgresql15 postgresql15-server
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo dnf install -y nodejs
-sudo systemctl enable --now docker
-sudo usermod -aG docker ec2-user
-sudo postgresql-setup --initdb
-sudo systemctl enable --now postgresql
-```
-
-Clone and install the application:
-
-```bash
-git clone https://github.com/meysamraza/E-com-site.git app
-cd app
-npm install
-```
-
-Initialize the database and start the application service according to the task configuration:
-
-```bash
-npm run db:init
-sudo systemctl daemon-reload
-sudo systemctl enable --now shop
-```
-
-## RDS Validation
-
-Run the database connectivity query from the application host:
+Run a SQL validation query:
 
 ```bash
 PGPASSWORD='<DB-PASSWORD>' psql \
@@ -79,54 +56,50 @@ PGPASSWORD='<DB-PASSWORD>' psql \
   -c "select 1"
 ```
 
-Expected result:
-
-```text
-1
-```
-
 ## Docker and ECR
 
-Authenticate Docker to the private ECR registry:
+Authenticate to the private ECR registry:
 
 ```bash
 aws ecr get-login-password --region "$AWS_REGION" \
   | docker login --username AWS \
-  --password-stdin <ACCOUNT-ID>.dkr.ecr.$AWS_REGION.amazonaws.com
+  --password-stdin 584860296694.dkr.ecr.ap-south-1.amazonaws.com
 ```
 
-Build, tag, and push the image:
+Build, tag, and push the application image:
 
 ```bash
-docker build --platform linux/amd64 -t <REPOSITORY-NAME> .
-docker tag <REPOSITORY-NAME>:latest \
-  <ACCOUNT-ID>.dkr.ecr.$AWS_REGION.amazonaws.com/<REPOSITORY-NAME>:latest
+docker build --platform linux/amd64 -t ecom-app .
+docker tag ecom-app:latest \
+  584860296694.dkr.ecr.ap-south-1.amazonaws.com/ecom-app:latest
 docker push \
-  <ACCOUNT-ID>.dkr.ecr.$AWS_REGION.amazonaws.com/<REPOSITORY-NAME>:latest
+  584860296694.dkr.ecr.ap-south-1.amazonaws.com/ecom-app:latest
 ```
 
 Verify the image:
 
 ```bash
 aws ecr describe-images \
-  --repository-name <REPOSITORY-NAME> \
+  --repository-name ecom-app \
   --region "$AWS_REGION"
 ```
 
 ## ECS
 
-List clusters:
+Inspect the EC2-backed cluster:
 
 ```bash
-aws ecs list-clusters --region "$AWS_REGION"
+aws ecs describe-clusters \
+  --clusters ecom-ec2-cluster \
+  --region "$AWS_REGION"
 ```
 
 Inspect the service:
 
 ```bash
 aws ecs describe-services \
-  --cluster <ECS-CLUSTER> \
-  --services <ECS-SERVICE> \
+  --cluster ecom-ec2-cluster \
+  --services ecom-service \
   --region "$AWS_REGION"
 ```
 
@@ -134,18 +107,26 @@ List running tasks:
 
 ```bash
 aws ecs list-tasks \
-  --cluster <ECS-CLUSTER> \
-  --service-name <ECS-SERVICE> \
+  --cluster ecom-ec2-cluster \
+  --service-name ecom-service \
   --desired-status RUNNING \
+  --region "$AWS_REGION"
+```
+
+Inspect the task definition:
+
+```bash
+aws ecs describe-task-definition \
+  --task-definition ecom-task-ec2:2 \
   --region "$AWS_REGION"
 ```
 
 ## Load Balancer Validation
 
-Check the production ALB endpoint:
+Validate the final ALB health endpoint:
 
 ```bash
-curl http://prod-alb-1957656459.ap-south-1.elb.amazonaws.com/health
+curl http://ecom-alb-1812614674.ap-south-1.elb.amazonaws.com/health
 ```
 
 Inspect target health:
@@ -161,12 +142,14 @@ aws elbv2 describe-target-health \
 ```bash
 aws application-autoscaling describe-scalable-targets \
   --service-namespace ecs \
+  --resource-ids service/ecom-ec2-cluster/ecom-service \
   --region "$AWS_REGION"
 ```
 
 ```bash
 aws application-autoscaling describe-scaling-policies \
   --service-namespace ecs \
+  --resource-id service/ecom-ec2-cluster/ecom-service \
   --region "$AWS_REGION"
 ```
 
@@ -176,47 +159,26 @@ Review ECS service events:
 
 ```bash
 aws ecs describe-services \
-  --cluster <ECS-CLUSTER> \
-  --services <ECS-SERVICE> \
+  --cluster ecom-ec2-cluster \
+  --services ecom-service \
   --query 'services[0].events[:10]' \
   --region "$AWS_REGION"
 ```
 
-Inspect an ECS task:
+Inspect a task:
 
 ```bash
 aws ecs describe-tasks \
-  --cluster <ECS-CLUSTER> \
+  --cluster ecom-ec2-cluster \
   --tasks <TASK-ARN> \
   --region "$AWS_REGION"
 ```
 
-Review application logs when the `awslogs` driver is configured:
+Review CloudWatch logs when the `awslogs` driver is configured:
 
 ```bash
 aws logs tail <LOG-GROUP> \
   --since 30m \
   --follow \
-  --region "$AWS_REGION"
-```
-
-## Security Checks
-
-Confirm the RDS instance is not publicly accessible:
-
-```bash
-aws rds describe-db-instances \
-  --db-instance-identifier <DB-IDENTIFIER> \
-  --query 'DBInstances[0].PubliclyAccessible' \
-  --region "$AWS_REGION"
-```
-
-Confirm the ECS service task counts:
-
-```bash
-aws ecs describe-services \
-  --cluster <ECS-CLUSTER> \
-  --services <ECS-SERVICE> \
-  --query 'services[0].{desired:desiredCount,running:runningCount,pending:pendingCount}' \
   --region "$AWS_REGION"
 ```
